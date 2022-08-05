@@ -27,26 +27,28 @@ func CreateUser(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func GetAllUsers(user *models.User, pagination *models.Pagination) (*[]models.User, int64, error) {
+func GetAllUsers(user *models.User, pagination *models.Pagination) (*[]models.User, *models.Pagination, error) {
+	// var paginationResp models.PaginationResp
 	db, conErr := utils.GetDatabaseConnection()
 	if conErr != nil {
 		log.Err(conErr).Msg("Error occurred while getting a DB connection from the connection pool")
-		return nil, 0, conErr
+		return nil, nil, conErr
 	}
 	var users []models.User
 	var totalRows int64 = 0
-	offset := (pagination.Page - 1) * pagination.Limit
-	queryBuider := db.Limit(pagination.Limit).Offset(offset).Order(pagination.Sort)
-	// queryBuider := config.DB.Limit(pagination.Limit).Offset(offset).Order(pagination.Sort)
+	queryBuider := db.Limit(pagination.GetLimit()).Offset(pagination.GetOffset()).Order(pagination.Sort)
 	result := queryBuider.Model(&models.User{}).Where(user).Find(&users)
+
 	if result.Error != nil {
 		msg := result.Error
-		return nil, totalRows, msg
+		return nil, &models.Pagination{}, msg
 	}
-	// errCount := config.DB.Model(&models.User{}).Count(&totalRows).Error
 	errCount := db.Model(&models.User{}).Count(&totalRows).Error
 	if errCount != nil {
-		return nil, totalRows, errCount
+		return nil, &models.Pagination{}, errCount
 	}
-	return &users, totalRows, nil
+	// paginationResp.PageIndex = pagination.GetOffset()
+	// paginationResp.TotalPage = models.GetTotalPages(totalRows, pagination.GetSize())
+	// paginationResp.Size = pagination.GetLimit()
+	return &users, &models.Pagination{}, nil
 }

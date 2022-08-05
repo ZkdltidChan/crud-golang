@@ -9,7 +9,7 @@ type User struct {
 	// gorm.Model
 	ID        string         `gorm:"primaryKey" json:"id"`
 	Username  string         `json:"username" binding:"required"`
-	Password  string         `json:"password" binding:"required"`
+	Password  string         `json:"-" binding:"required"`
 	Email     string         `json:"email" binding:"required"`
 	NickName  string         `json:"nick_name"`
 	CreatedAt int64          `gorm:"autoCreateTime:milli" json:"created_at"`

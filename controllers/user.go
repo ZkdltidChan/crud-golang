@@ -30,7 +30,7 @@ func AuthHandler(c *gin.Context) {
 	}
 	vu, err := repo.Login(&user)
 	if err != nil {
-		
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": -1,
 			"msg":    "Failed to parse params" + err.Error(),
@@ -101,18 +101,19 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetAllUsers(c *gin.Context) {
-
 	pagination := utils.GeneratePaginationFromRequest(c)
 	var user models.User
-	userLists, totalRows, err := repo.GetAllUsers(&user, &pagination)
-
+	var resp models.PaginationResp
+	userLists, paginationResp, err := repo.GetAllUsers(&user, &pagination)
+	p
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
 		return
-
 	}
+	
+
 	c.JSON(http.StatusOK, gin.H{
 		"data":      userLists,
 		"totalList": totalRows,
